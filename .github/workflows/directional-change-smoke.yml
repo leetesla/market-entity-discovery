@@ -1,0 +1,55 @@
+name: Directional Change Real Data Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/market_entity_discovery/directional_change.py"
+      - "scripts/run_directional_change.py"
+      - "tests/test_directional_change.py"
+      - ".github/workflows/directional-change-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  btcusdt-directional-change:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install
+        run: pip install -e .
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Download BTCUSDT 1m official Binance data
+        run: |
+          python scripts/download_binance.py \
+            --symbol BTCUSDT \
+            --interval 1m \
+            --start 2025-01 \
+            --end 2025-01 \
+            --market futures_um \
+            --merged data/processed/BTCUSDT-1m.csv
+
+      - name: Run multi-scale Directional Change
+        run: |
+          python scripts/run_directional_change.py \
+            --csv data/processed/BTCUSDT-1m.csv \
+            --out experiments/btcusdt_1m_directional_change \
+            --thresholds 0.0025,0.005,0.01,0.02,0.04
+          cat experiments/btcusdt_1m_directional_change/summary.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: btcusdt-directional-change
+          path: experiments/btcusdt_1m_directional_change/
+          if-no-files-found: warn
