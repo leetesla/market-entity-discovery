@@ -43,16 +43,32 @@ def run_v0(
     val_hits = match_entities(train_values, val_values, window_size, entities)
     test_hits = match_entities(train_values, test_values, window_size, entities)
 
+    def occurrence_times(frame: pd.DataFrame, indices: list[int]) -> list[str]:
+        if "timestamp" not in frame.columns:
+            return []
+        return [str(frame.iloc[i]["timestamp"]) for i in indices if 0 <= i < len(frame)]
+
     rows = []
     for e in entities:
+        train_support = len(e.train_occurrences)
+        validation_support = len(val_hits[e.entity_id])
+        test_support = len(test_hits[e.entity_id])
         rows.append(
             {
                 **e.to_dict(),
+                "prototype_time": occurrence_times(train, [e.prototype_index])[0] if "timestamp" in train.columns else None,
+                "nearest_neighbor_time": occurrence_times(train, [e.nearest_neighbor_index])[0] if "timestamp" in train.columns else None,
+                "train_occurrence_times": occurrence_times(train, e.train_occurrences),
                 "validation_occurrences": val_hits[e.entity_id],
+                "validation_occurrence_times": occurrence_times(val, val_hits[e.entity_id]),
                 "test_occurrences": test_hits[e.entity_id],
-                "train_support": len(e.train_occurrences),
-                "validation_support": len(val_hits[e.entity_id]),
-                "test_support": len(test_hits[e.entity_id]),
+                "test_occurrence_times": occurrence_times(test, test_hits[e.entity_id]),
+                "train_support": train_support,
+                "validation_support": validation_support,
+                "test_support": test_support,
+                "train_nonoverlap_coverage": train_support * window_size / len(train),
+                "validation_nonoverlap_coverage": validation_support * window_size / len(val),
+                "test_nonoverlap_coverage": test_support * window_size / len(test),
             }
         )
 
