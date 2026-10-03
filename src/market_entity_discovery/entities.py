@@ -29,6 +29,16 @@ def _greedy_non_overlapping(indices: Iterable[int], min_gap: int) -> list[int]:
     return kept
 
 
+def _mean_dimension_distance(windows: np.ndarray, prototype: np.ndarray) -> np.ndarray:
+    """Mean z-normalized Euclidean distance across dimensions.
+
+    This matches the distance semantics used by the final row of STUMPY's
+    multidimensional matrix profile when all dimensions are included.
+    """
+    per_dimension = np.linalg.norm(windows - prototype[None, :, :], axis=2)
+    return per_dimension.mean(axis=1)
+
+
 def discover_entities(
     values: np.ndarray,
     m: int,
@@ -38,7 +48,6 @@ def discover_entities(
     min_support: int = 3,
 ) -> list[Entity]:
     windows = z_normalized_windows(values, m)
-    flat = windows.reshape(len(windows), -1)
     candidates = np.argsort(mp.profile)
     consumed: list[int] = []
     entities: list[Entity] = []
@@ -50,8 +59,8 @@ def discover_entities(
         if any(abs(int(seed) - x) < m or abs(nn - x) < m for x in consumed):
             continue
 
-        proto = flat[seed]
-        distances = np.linalg.norm(flat - proto, axis=1)
+        proto = windows[seed]
+        distances = _mean_dimension_distance(windows, proto)
         threshold = float(mp.profile[seed] * distance_multiplier)
         member_candidates = np.flatnonzero(distances <= threshold)
         members = _greedy_non_overlapping(member_candidates, m)
@@ -81,12 +90,12 @@ def match_entities(
 ) -> dict[str, list[int]]:
     if not entities or len(target_values) < m:
         return {e.entity_id: [] for e in entities}
-    train_w = z_normalized_windows(train_values, m).reshape(-1, train_values.shape[1] * m)
-    target_w = z_normalized_windows(target_values, m).reshape(-1, target_values.shape[1] * m)
+    train_w = z_normalized_windows(train_values, m)
+    target_w = z_normalized_windows(target_values, m)
     result: dict[str, list[int]] = {}
     for e in entities:
         proto = train_w[e.prototype_index]
-        d = np.linalg.norm(target_w - proto, axis=1)
+        d = _mean_dimension_distance(target_w, proto)
         hits = _greedy_non_overlapping(np.flatnonzero(d <= e.threshold), m)
         result[e.entity_id] = hits
     return result
