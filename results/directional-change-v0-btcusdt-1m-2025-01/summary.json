@@ -1,0 +1,49 @@
+{
+  "dataset": {
+    "symbol": "BTCUSDT",
+    "market": "futures_um",
+    "interval": "1m",
+    "source": "Binance Public Data / Binance Vision",
+    "archive_month": "2025-01",
+    "rows": 44640,
+    "price_column": "close"
+  },
+  "thresholds": [0.0025, 0.005, 0.01, 0.02, 0.04],
+  "by_threshold": [
+    {"threshold_pct":0.25,"event_count":1849,"upturn_count":925,"downturn_count":924,"median_confirmation_bars":5.0,"median_overshoot_bars":5.0,"median_overshoot_pct":0.0017263277775567132,"median_interconfirmation_bars":13.0},
+    {"threshold_pct":0.5,"event_count":633,"upturn_count":317,"downturn_count":316,"median_confirmation_bars":14.0,"median_overshoot_bars":12.0,"median_overshoot_pct":0.003544119403568635,"median_interconfirmation_bars":36.0},
+    {"threshold_pct":1.0,"event_count":194,"upturn_count":97,"downturn_count":97,"median_confirmation_bars":43.0,"median_overshoot_bars":34.0,"median_overshoot_pct":0.006512773343619216,"median_interconfirmation_bars":96.0},
+    {"threshold_pct":2.0,"event_count":52,"upturn_count":26,"downturn_count":26,"median_confirmation_bars":101.5,"median_overshoot_bars":139.0,"median_overshoot_pct":0.01588064381613119,"median_interconfirmation_bars":269.0},
+    {"threshold_pct":4.0,"event_count":16,"upturn_count":8,"downturn_count":8,"median_confirmation_bars":618.5,"median_overshoot_bars":492.0,"median_overshoot_pct":0.028629801233005847,"median_interconfirmation_bars":1219.0}
+  ],
+  "intrinsic_states": {
+    "state_order": ["0.25%","0.5%","1%","2%","4%"],
+    "valid_rows": 42604,
+    "unique_states": 32,
+    "theoretical_states": 32,
+    "compressed_state_changes": 2596,
+    "top_states": [
+      {"state":"UUUUU","count":3980,"share":0.0934184583607173},
+      {"state":"DDUUU","count":3619,"share":0.08494507557975776},
+      {"state":"DDDUU","count":3481,"share":0.0817059431039339},
+      {"state":"DUUUU","count":2763,"share":0.0648530654398648},
+      {"state":"UDDUU","count":2450,"share":0.057506337433104876}
+    ],
+    "top_transitions": [
+      {"from":"UUUUU","to":"DUUUU","count":186},
+      {"from":"DDDUU","to":"UDDUU","count":123},
+      {"from":"DDUUU","to":"UDUUU","count":115},
+      {"from":"DDDDU","to":"UDDDU","count":108},
+      {"from":"DDDDD","to":"UDDDD","count":100},
+      {"from":"DUUUU","to":"DDUUU","count":94},
+      {"from":"DUUUU","to":"UUUUU","count":91}
+    ]
+  },
+  "selected_transition_branches": {
+    "UUUUU":{"outgoing_state_changes":193,"DUUUU":186,"DUUUU_share":0.9637305699481865},
+    "DUUUU":{"outgoing_state_changes":186,"DDUUU":94,"DDUUU_share":0.5053763440860215,"UUUUU":91,"UUUUU_share":0.489247311827957},
+    "DDDDD":{"outgoing_state_changes":113,"UDDDD":100,"UDDDD_share":0.8849557522123894},
+    "UDDDD":{"outgoing_state_changes":100,"UUDDD":53,"UUDDD_share":0.53,"DDDDD":47,"DDDDD_share":0.47}
+  },
+  "causality_note": "States change only at confirmation time. Historical extremum timestamps must not be treated as known before confirmation."
+}
