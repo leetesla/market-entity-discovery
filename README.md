@@ -126,3 +126,8 @@ The first baseline uses all six dimensions. Sub-dimensional discovery (LAMA), le
 3. Add a block-shuffle null model.
 4. Add LAMA as a sub-dimensional baseline.
 5. Compare learned representations only after the non-learning baseline is stable.
+
+
+## Research notes
+
+- [Non-candlestick market representations and entity map](docs/research/non-candlestick-market-representations.md) — trajectory, Directional Change, swing/pivot, TPO/Market Profile, Volume Profile, tape, order flow, LOB/MBO, and event-time representations.
