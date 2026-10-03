@@ -17,9 +17,15 @@ class DirectionalChangeTests(unittest.TestCase):
         prices = [100, 99, 98, 99, 100, 101, 100, 99, 98, 99, 100]
         events = extract_directional_changes(prices, 0.02)
 
-        self.assertEqual([e.direction for e in events], ["UPTURN", "DOWNTURN", "UPTURN"])
-        self.assertEqual([e.extremum_index for e in events], [2, 5, 8])
-        self.assertEqual([e.confirmation_index for e in events], [4, 8, 10])
+        # The initial direction is intentionally not assumed. Because the series
+        # first falls 2% from its running high, the first causal event is a
+        # DOWNTURN. Subsequent events alternate by construction.
+        self.assertEqual(
+            [e.direction for e in events],
+            ["DOWNTURN", "UPTURN", "DOWNTURN", "UPTURN"],
+        )
+        self.assertEqual([e.extremum_index for e in events], [0, 2, 5, 8])
+        self.assertEqual([e.confirmation_index for e in events], [2, 4, 8, 10])
 
         for event in events:
             self.assertLessEqual(event.extremum_index, event.confirmation_index)
@@ -29,7 +35,8 @@ class DirectionalChangeTests(unittest.TestCase):
         events = extract_directional_changes(prices, 0.02)
         state = directional_state_series(len(prices), events)
 
-        self.assertTrue(np.all(state[:4] == 0))
+        self.assertTrue(np.all(state[:2] == 0))
+        self.assertTrue(np.all(state[2:4] == -1))
         self.assertTrue(np.all(state[4:8] == 1))
         self.assertTrue(np.all(state[8:10] == -1))
         self.assertEqual(int(state[10]), 1)
@@ -37,10 +44,11 @@ class DirectionalChangeTests(unittest.TestCase):
     def test_overshoot_annotation(self):
         prices = [100, 99, 98, 99, 100, 101, 102, 100, 99, 98, 99, 100]
         events = extract_directional_changes(prices, 0.02)
-        first = events[0]
-        self.assertEqual(first.direction, "UPTURN")
-        self.assertEqual(first.overshoot_end_price, 102.0)
-        self.assertGreater(first.overshoot_pct or 0, 0)
+
+        upturn = events[1]
+        self.assertEqual(upturn.direction, "UPTURN")
+        self.assertEqual(upturn.overshoot_end_price, 102.0)
+        self.assertGreater(upturn.overshoot_pct or 0, 0)
 
     def test_multiscale_states(self):
         prices = np.r_[
