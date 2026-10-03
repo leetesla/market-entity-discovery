@@ -1,0 +1,30 @@
+{
+  "dataset": {
+    "symbol": "BTCUSDT",
+    "market": "futures_um",
+    "interval": "5m",
+    "source": "Binance Public Data / Binance Vision",
+    "archive_month": "2025-01"
+  },
+  "experiment": {
+    "rows": 2500,
+    "window_size": 24,
+    "backend": "stumpy_mstump",
+    "feature_columns": [
+      "log_return",
+      "range_pct",
+      "body_pct",
+      "log_volume",
+      "delta_ratio",
+      "cvd_12_ratio"
+    ],
+    "split_rows": {
+      "train": 1500,
+      "validation": 476,
+      "test": 476
+    },
+    "entity_count": 2,
+    "entities_with_validation_recurrence": 2,
+    "entities_with_test_recurrence": 2
+  }
+}
