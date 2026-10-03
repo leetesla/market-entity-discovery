@@ -131,3 +131,14 @@ The first baseline uses all six dimensions. Sub-dimensional discovery (LAMA), le
 ## Research notes
 
 - [Non-candlestick market representations and entity map](docs/research/non-candlestick-market-representations.md) — trajectory, Directional Change, swing/pivot, TPO/Market Profile, Volume Profile, tape, order flow, LOB/MBO, and event-time representations.
+
+
+## Directional Change baseline
+
+The project now includes a causal multi-scale Directional Change representation on BTCUSDT 1m data.
+
+- Experiment design: docs/experiments/directional-change-v0.md
+- First real-data result: results/directional-change-v0-btcusdt-1m-2025-01/README.md
+- Reproducible runner: scripts/run_directional_change.py
+
+The first January 2025 run found 1,849 / 633 / 194 / 52 / 16 events at 0.25% / 0.5% / 1% / 2% / 4% reversal thresholds, respectively, and produced explicit multi-scale state-transition sequences for later entity discovery.
