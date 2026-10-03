@@ -15,6 +15,8 @@ class Entity:
     nearest_neighbor_index: int
     seed_distance: float
     threshold: float
+    background_median_distance: float
+    compactness_ratio: float
     train_occurrences: list[int]
 
     def to_dict(self) -> dict:
@@ -62,6 +64,8 @@ def discover_entities(
         proto = windows[seed]
         distances = _mean_dimension_distance(windows, proto)
         threshold = float(mp.profile[seed] * distance_multiplier)
+        background_median = float(np.median(distances[np.isfinite(distances)]))
+        compactness_ratio = threshold / background_median if background_median > 0 else float("inf")
         member_candidates = np.flatnonzero(distances <= threshold)
         members = _greedy_non_overlapping(member_candidates, m)
         if len(members) < min_support:
@@ -73,6 +77,8 @@ def discover_entities(
             nearest_neighbor_index=nn,
             seed_distance=float(mp.profile[seed]),
             threshold=threshold,
+            background_median_distance=background_median,
+            compactness_ratio=compactness_ratio,
             train_occurrences=members,
         )
         entities.append(entity)
