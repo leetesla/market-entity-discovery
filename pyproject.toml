@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "market-entity-discovery"
+version = "0.1.0"
+description = "Discover recurrent market entities in multivariate financial time series."
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26,<2.3",
+  "pandas>=2.1",
+]
+
+[project.optional-dependencies]
+stumpy = ["stumpy>=1.13"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
