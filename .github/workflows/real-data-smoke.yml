@@ -1,0 +1,57 @@
+name: Real Data Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "pyproject.toml"
+      - ".github/workflows/real-data-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  btcusdt-v0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install
+        run: pip install -e '.[stumpy]'
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Download official Binance data
+        run: |
+          python scripts/download_binance.py \
+            --symbol BTCUSDT \
+            --interval 5m \
+            --start 2025-01 \
+            --end 2025-01 \
+            --market futures_um
+
+      - name: Run real-data V0 smoke
+        run: |
+          python scripts/run_v0.py \
+            --csv data/processed/BTCUSDT-5m.csv \
+            --window 24 \
+            --backend stumpy \
+            --max-rows 2500 \
+            --max-entities 8
+          cat experiments/btcusdt_5m_m24/summary.json
+          cat experiments/btcusdt_5m_m24/entities.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: btcusdt-v0-smoke
+          path: experiments/btcusdt_5m_m24/
+          if-no-files-found: warn
